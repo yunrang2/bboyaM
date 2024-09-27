@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1920x1080 화면</title>
+    <style>
+        @font-face {
+            font-family: 'DNFBitBit';
+            src: url('https://raw.githubusercontent.com/yunrang2/upload/master/DNFBitBitv2.ttf') format('truetype');
+        }
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #00FF00; /* 크로마키 녹색 */
+            height: 100vh;
+            overflow: hidden; /* 스크롤 방지 */
+            font-family: 'DNFBitBit', Arial, sans-serif;
+        }
+        .canvas {
+            position: relative;
+            width: 1920px;
+            height: 1080px;
+            background-color: #00FF00; /* 동일한 크로마키 녹색 */
+        }
+        .top-left {
+            position: absolute;
+            top: 33px; /* 65% 증가 */
+            left: 33px; /* 65% 증가 */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .top-left img {
+            width: 435.6px; /* 65% 증가 */
+            height: auto;
+            cursor: pointer;
+        }
+        .button-row {
+            display: flex;
+            margin-top: 21.78px; /* 65% 증가 */
+        }
+        .button-row button {
+            background-color: #FF69B4; /* 분홍색 */
+            border: none;
+            color: white;
+            padding: 10.89px 21.78px; /* 65% 증가 */
+            text-align: center;
+            text-decoration: none;
+            display: block;
+            font-size: 21.78px; /* 65% 증가 */
+            margin: 10.89px 10.89px; /* 65% 증가 */
+            cursor: pointer;
+            font-family: 'DNFBitBit', Arial, sans-serif;
+            box-shadow: 0 4.356px #666; /* 65% 증가 */
+            border-radius: 10.89px; /* 65% 증가 */
+            transition: transform 0.2s ease;
+            text-shadow: 1px 1px 1px #000; /* 텍스트 테두리 추가 */
+        }
+        .button-row button#profile-btn {
+            width: 131.4px; /* 65% 증가 */
+        }
+        .button-row button#schedule-btn, .button-row button#signature-btn {
+            width: 153.18px; /* 65% 증가 */
+        }
+        .button-row button:hover {
+            transform: translateY(-4.356px); /* 65% 증가 */
+        }
+        .button-row button span {
+            text-shadow: -2.178px -2.178px 0 #000, 2.178px -2.178px 0 #000, -2.178px 2.178px 0 #000, 2.178px 2.178px 0 #000; /* 65% 증가 */
+        }
+        .bottom-right {
+            position: absolute;
+            bottom: 33px; /* 65% 증가 */
+            right: 33px; /* 65% 증가 */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        .bottom-right button {
+            background-color: #DDA0DD; /* 자두색 */
+            border: none;
+            color: white;
+            padding: 21.78px 32.67px; /* 65% 증가 */
+            text-align: center;
+            text-decoration: none;
+            display: block;
+            font-size: 26.73px; /* 65% 증가 */
+            margin: 10.89px 0; /* 65% 증가 */
+            cursor: pointer;
+            width: 209.1px; /* 65% 증가 */
+            font-family: 'DNFBitBit', Arial, sans-serif;
+            box-shadow: 0 4.356px #666; /* 65% 증가 */
+            border-radius: 10.89px; /* 65% 증가 */
+            transition: width 0.3s ease, transform 0.2s ease;
+            position: relative;
+            white-space: nowrap; /* 한 줄로 만들기 */
+            text-shadow: 1px 1px 1px #000; /* 텍스트 테두리 추가 */
+        }
+        .bottom-right button:hover {
+            width: 344.52px; /* 65% 증가 */
+        }
+        .bottom-right button span {
+            text-shadow: -2.178px -2.178px 0 #000, 2.178px -2.178px 0 #000, -2.178px 2.178px 0 #000, 2.178px 2.178px 0 #000; /* 65% 증가 */
+        }
+        .dynamic-buttons {
+            position: absolute;
+            top: 33px;
+            right: 33px;
+            display: none;
+            flex-direction: column;
+            align-items: flex-end;
+            z-index: 1000;
+        }
+        .dynamic-buttons .button-row {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+        }
+        .dynamic-buttons button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'DNFBitBit', Arial, sans-serif; /* 폰트 적용 */
+            text-shadow: 1px 1px 1px #000; /* 텍스트 테두리 추가 */
+        }
+        .dynamic-buttons .bgm-button {
+            background-color: #1E90FF;
+            color: white;
+        }
+        .dynamic-buttons .reaction-button {
+            background-color: #FF69B4;
+            color: white;
+        }
+        .dynamic-buttons .stop-button {
+            background-color: red;
+            color: white;
+        }
+        .dynamic-buttons .close-button {
+            background-color: #FF4500;
+            color: white;
+        }
+        .return-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #FF4500;
+            color: white;
+            padding: 10px 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+            z-index: 1000;
+            font-family: 'DNFBitBit', Arial, sans-serif; /* 폰트 적용 */
+            text-shadow: 1px 1px 1px #000; /* 텍스트 테두리 추가 */
+        }
+        .modal {
+            display: none;
+            position: absolute;
+            background-color: white;
+            border: 2.178px solid #666; /* 65% 증가 */
+            box-shadow: 0 4.356px 10.89px rgba(0,0,0,0.2); /* 65% 증가 */
+            border-radius: 10.89px; /* 65% 증가 */
+            padding: 21.78px; /* 65% 증가 */
+            z-index: 1000;
+            font-family: 'DNFBitBit', Arial, sans-serif;
+            text-align: center;
+        }
+        .modal.active {
+            display: block;
+        }
+        .modal button {
+            background-color: #1E90FF; /* 파란색 */
+            border: none;
+            color: white;
+            padding: 10.89px 21.78px; /* 65% 증가 */
+            text-align: center;
+            text-decoration: none;
+            display: block;
+            font-size: 21.78px; /* 65% 증가 */
+            margin: 10.89px auto; /* 65% 증가 및 가운데 정렬 */
+            cursor: pointer;
+            width: 120px; /* 가로 크기 줄임 */
+            font-family: 'DNFBitBit', Arial, sans-serif;
+            box-shadow: 0 4.356px #666; /* 65% 증가 */
+            border-radius: 10.89px; /* 65% 증가 */
+            transition: transform 0.2s ease;
+            text-shadow: 1px 1px 1px #000; /* 텍스트 테두리 추가 */
+        }
+        .modal button.stop-button {
+            background-color: red; /* 중지 버튼 빨간색 */
+        }
+        .modal button.close-button {
+            background-color: #FF4500; /* 닫기 버튼 주황색 */
+        }
+        .modal button:hover {
+            transform: translateY(-4.356px); /* 65% 증가 */
+        }
+        .modal button span {
+            text-shadow: -2.178px -2.178px 0 #000, 2.178px -2.178px 0 #000, -2.178px 2.178px 0 #000, 2.178px 2.178px 0 #000; /* 65% 증가 */
+        }
+        #profile-modal, #schedule-modal, #signature-modal {
+            top: 50%;
+            left: 50px;
+            transform: translateY(-50%);
+        }
+        #timer-modal {
+            top: 100px;
+            right: 100px;
+            width: auto;
+        }
+        .timer-box {
+            display: none;
+            position: fixed;
+            background-color: white;
+            border: 2.178px solid #000;
+            padding: 21.78px;
+            font-size: 43.55px;
+            font-family: 'DNFBitBit', Arial, sans-serif;
+            text-align: center;
+            z-index: 1000;
+            cursor: pointer;
+        }
+        .timer-box.vibrate {
+            animation: vibrate 0.1s infinite;
+        }
+        @keyframes vibrate {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-2.178px); }
+            50% { transform: translateX(2.178px); }
+            75% { transform: translateX(-2.178px); }
+            100% { transform: translateX(2.178px); }
+        }
+        .modal-title {
+            color: #FF69B4;
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px #000;
+        }
+        .modal-content {
+            font-size: 24px;
+            text-shadow: 1px 1px 2px #000;
+        }
+        .modal-content .heart {
+            color: red;
+        }
+    </style>
+    <script>
+        let timers = [];
+        let timerPositions = [
+            { top: '33px', left: '30%' },
+            { top: '33px', left: '50%' },
+            { top: '33px', left: '70%' }
+        ];
+        let currentPosition = 0;
+        let currentAudio = null;
+        let contentVisible = true;
+
+        function toggleModal(modalId) {
+            removeDynamicButtons();
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (modal.id !== modalId) {
+                    modal.classList.remove('active');
+                }
+            });
+            const modal = document.getElementById(modalId);
+            modal.classList.toggle('active');
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('active');
+        }
+
+        function showDynamicButtons(type) {
+            const existingContainer = document.getElementById('dynamic-buttons');
+            if (existingContainer && existingContainer.dataset.type === type) {
+                existingContainer.remove();
+                return;
+            }
+
+            removeDynamicButtons();
+            closeModal('profile-modal');
+            closeModal('schedule-modal');
+            closeModal('signature-modal');
+            closeModal('timer-modal');
+
+            const buttonContainer = document.createElement('div');
+            buttonContainer.className = 'dynamic-buttons';
+            buttonContainer.id = 'dynamic-buttons';
+            buttonContainer.dataset.type = type;
+
+            let buttons = [];
+            if (type === 'bgm') {
+                buttons = [
+                    { text: '섹시', audio: 'https://raw.githubusercontent.com/yunrang2/upload/master/섹시.mp3' },
+                    { text: '불쌍', audio: 'https://raw.githubusercontent.com/yunrang2/upload/master/불쌍.mp3' },
+                    { text: '게임', audio: 'https://raw.githubusercontent.com/yunrang2/upload/master/게임.mp3' },
+                    { text: '원투', audio: 'https://raw.githubusercontent.com/yunrang2/upload/master/원투.mp3' },
+                    { text: '코난', audio: 'https://raw.githubusercontent.com/yunrang2/upload/master/코난등장.mp3' },
+                    { text: '황당', audio: 'https://raw.githubusercontent.com/yunrang2/upload/master/황당.mp3' },
+                    { text: '멸망', audio: 'https://raw.githubusercontent.com/yunrang2/upload/master/멸망.mp3' },
+                    { text: '중지', action: stopAudio }
+                ];
+            } else if (type === 'reaction') {
+                buttons = [
+                    { text: '아리가또', audio: 'https://raw.githubusercontent.com/yunrang2/upload/master/아리가또_고자이마스.mp3' },
+                    { text: '짜라빠빠', audio: 'https://raw.githubusercontent.com/yunrang2/upload/master/짜라빠빠.mp3' },
+                    { text: '오로나민C', audio: 'https://raw.githubusercontent.com/yunrang2/upload/master/오로나민C.mp3' },
+                    { text: '사쿠란보', audio: 'https://raw.githubusercontent.com/yunrang2/upload/master/사쿠란보.mp3' },
+                    { text: '탕탕탕', audio: 'https://raw.githubusercontent.com/yunrang2/upload/master/탕탕탕.mp3' },
+                    { text: '마라탕후루', audio: 'https://raw.githubusercontent.com/yunrang2/upload/master/마라탕후루.mp3' },
+                    { text: '솜사탕', audio: 'https://raw.githubusercontent.com/yunrang2/upload/master/솜사탕.mp3' },
+                    { text: '제로투', audio: 'https://raw.githubusercontent.com/yunrang2/upload/master/제로투.mp3' },
+                    { text: '코카인', audio: 'https://raw.githubusercontent.com/yunrang2/upload/master/코카인.mp3' },
+                    { text: '제로콕', audio: 'https://raw.githubusercontent.com/yunrang2/upload/master/제로콕.mp3' },
+                    { text: '여봉봉', audio: 'https://raw.githubusercontent.com/yunrang2/upload/master/여봉봉.mp3' },
+                    { text: '중지', action: stopAudio }
+                ];
+            }
+
+            buttons.forEach((btn, index) => {
+                const button = document.createElement('button');
+                button.className = type === 'bgm' ? 'bgm-button' : 'reaction-button';
+                button.innerText = btn.text;
+                if (btn.audio) {
+                    button.onclick = () => playAudio(btn.audio);
+                } else if (btn.action) {
+                    button.onclick = btn.action;
+                    button.className += ' stop-button';
+                }
+
+                if (index % 2 === 0) {
+                    const row = document.createElement('div');
+                    row.className = 'button-row';
+                    buttonContainer.appendChild(row);
+                    row.appendChild(button);
+                } else {
+                    buttonContainer.lastChild.appendChild(button);
+                }
+            });
+
+            const closeButton = document.createElement('button');
+            closeButton.className = 'close-button';
+            closeButton.innerText = '닫기';
+            closeButton.onclick = removeDynamicButtons;
+            buttonContainer.appendChild(closeButton);
+
+            document.body.appendChild(buttonContainer);
+            buttonContainer.style.display = 'flex';
+        }
+
+        function removeDynamicButtons() {
+            const existingContainer = document.getElementById('dynamic-buttons');
+            if (existingContainer) {
+                existingContainer.remove();
+            }
+        }
+
+        function toggleContentVisibility() {
+            const elements = document.querySelectorAll('.top-left, .bottom-right, .modal, .dynamic-buttons');
+            elements.forEach(element => {
+                element.style.display = contentVisible ? 'none' : '';
+            });
+            document.getElementById('return-button').style.display = contentVisible ? 'block' : 'none';
+            contentVisible = !contentVisible;
+        }
+
+        function createTimer(duration) {
+            let timer = timers.find(t => t.duration === duration);
+            if (timer) {
+                timer.remaining += duration;
+                timer.element.textContent = formatTime(timer.remaining);
+                return;
+            }
+
+            let timerBox = document.createElement('div');
+            timerBox.className = 'timer-box';
+            timerBox.dataset.duration = duration;
+            timerBox.style.top = timerPositions[currentPosition].top;
+            timerBox.style.left = timerPositions[currentPosition].left;
+            document.body.appendChild(timerBox);
+            currentPosition = (currentPosition + 1) % timerPositions.length;
+
+            timerBox.style.display = 'block';
+            timerBox.textContent = formatTime(duration);
+
+            timer = {
+                element: timerBox,
+                duration: duration,
+                remaining: duration,
+                interval: null,
+                active: true
+            };
+            timers.push(timer);
+
+            timerBox.onclick = () => {
+                if (timer.active) {
+                    clearInterval(timer.interval);
+                } else {
+                    startTimer(timer);
+                }
+                timer.active = !timer.active;
+            };
+
+            startTimer(timer);
+        }
+
+        function startTimer(timer) {
+            if (timer.interval) {
+                clearInterval(timer.interval);
+            }
+            timer.interval = setInterval(() => {
+                if (timer.remaining > 0) {
+                    timer.remaining--;
+                    timer.element.textContent = formatTime(timer.remaining);
+
+                    if (timer.remaining <= 5) {
+                        timer.element.classList.add('vibrate');
+                        timer.element.style.backgroundColor = timer.remaining % 2 === 0 ? 'red' : 'white';
+                    } else {
+                        timer.element.classList.remove('vibrate');
+                        timer.element.style.backgroundColor = 'white';
+                    }
+                } else {
+                    clearInterval(timer.interval);
+                    timer.element.style.display = 'none';
+                }
+            }, 1000);
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        function playAudio(src) {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+            currentAudio = new Audio(src);
+            currentAudio.volume = 0.8;
+            currentAudio.play();
+        }
+
+        function stopAudio() {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+                currentAudio = null;
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="canvas">
+        <div class="top-left">
+            <img src="https://raw.githubusercontent.com/yunrang2/upload/master/뽀야누나%20미션판2.png" alt="미션판" onclick="toggleContentVisibility()">
+            <div class="button-row">
+                <button id="profile-btn" onclick="toggleModal('profile-modal')"><span>프로필</span></button>
+                <button id="schedule-btn" onclick="toggleModal('schedule-modal')"><span>방송시간</span></button>
+                <button id="signature-btn" onclick="toggleModal('signature-modal')"><span>시그니처</span></button>
+            </div>
+        </div>
+        <div class="bottom-right">
+            <button id="timer-btn" onclick="toggleModal('timer-modal')"><span>타이머</span></button>
+            <button id="bgm-btn" onclick="showDynamicButtons('bgm')"><span>브금</span></button>
+            <button id="reaction-btn" onclick="showDynamicButtons('reaction')"><span>리액션</span></button>
+        </div>
+        <button id="return-button" class="return-button" onclick="toggleContentVisibility()">돌아가기</button>
+        <div id="timer-modal" class="modal">
+            타이머 설정
+            <button onclick="createTimer(30)"><span>30초</span></button>
+            <button onclick="createTimer(900)"><span>15분</span></button>
+            <button class="close-button" onclick="closeModal('timer-modal')"><span>닫기</span></button>
+        </div>
+        <div id="profile-modal" class="modal">
+            <div class="modal-title">BJ갓뽀야</div>
+            <div class="modal-content">음방 소통 맛집</div>
+            <div class="modal-content">나이: 88황금용띠</div>
+            <div class="modal-content">직업: 연극배우</div>
+            <div class="modal-content">지역: 인천</div>
+            <div class="modal-content">키: 158</div>
+            <div class="modal-content">MBTI: ENTJ</div>
+            <button class="close-button" onclick="closeModal('profile-modal')"><span>닫기</span></button>
+        </div>
+        <div id="schedule-modal" class="modal">
+            <div class="modal-title">방송시간</div>
+            <div class="modal-content">오후10시~오전2시</div>
+            <div class="modal-content">(공연+연습시간에따라 변동될수있음)</div>
+            <div class="modal-content">랜덤 휴방</div>
+            <button class="close-button" onclick="closeModal('schedule-modal')"><span>닫기</span></button>
+        </div>
+        <div id="signature-modal" class="modal">
+            <div class="modal-title">갓뽀야 시그니처<span class="heart">♥</span></div>
+            <div class="modal-content">54<span class="heart">♥</span> 154<span class="heart">♥</span> 1054<span class="heart">♥</span></div>
+            <div class="modal-content">2854<span class="heart">♥</span> 10054<span class="heart">♥</span></div>
+            <button class="close-button" onclick="closeModal('signature-modal')"><span>닫기</span></button>
+        </div>
+    </div>
+</body>
+</html>
